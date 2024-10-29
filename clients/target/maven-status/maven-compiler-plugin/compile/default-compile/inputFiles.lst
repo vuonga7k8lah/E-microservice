@@ -1,4 +1,4 @@
-/Volumes/KINGSTON/Docker/microservices/clients/src/main/java/com/amigoscode/clients/notification/NotificationRequest.java
-/Volumes/KINGSTON/Docker/microservices/clients/src/main/java/com/amigoscode/clients/fraud/FraudCheckResponse.java
-/Volumes/KINGSTON/Docker/microservices/clients/src/main/java/com/amigoscode/clients/fraud/FraudClient.java
-/Volumes/KINGSTON/Docker/microservices/clients/src/main/java/com/amigoscode/clients/notification/NotificationClient.java
+/Volumes/KINGSTON/Docker/E-microservices/clients/src/main/java/com/amigoscode/clients/notification/NotificationRequest.java
+/Volumes/KINGSTON/Docker/E-microservices/clients/src/main/java/com/amigoscode/clients/fraud/FraudClient.java
+/Volumes/KINGSTON/Docker/E-microservices/clients/src/main/java/com/amigoscode/clients/fraud/FraudCheckResponse.java
+/Volumes/KINGSTON/Docker/E-microservices/clients/src/main/java/com/amigoscode/clients/notification/NotificationClient.java

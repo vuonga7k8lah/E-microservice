@@ -1,11 +1,17 @@
 import React from "react";
 import {Outlet} from "react-router-dom";
-
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
+import { AppSidebar } from "@/components/App-Sidebar/AppSidebar"
 const layout: React.FC = () => {
     return (
         <>
-            <h2>day la layout tong</h2>
-            <Outlet/>
+            <SidebarProvider>
+                <AppSidebar />
+                <main>
+                    <SidebarTrigger />
+                    <Outlet/>
+                </main>
+            </SidebarProvider>
         </>
     );
 }

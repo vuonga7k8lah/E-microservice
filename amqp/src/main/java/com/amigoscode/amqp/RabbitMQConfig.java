@@ -1,4 +1,4 @@
-package com.amigoscode.amqp;
+package com.vuongkma.amqp;
 
 import lombok.AllArgsConstructor;
 import org.springframework.amqp.core.AmqpTemplate;

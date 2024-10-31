@@ -9,8 +9,8 @@ spring:
     cloud:
        gateway:
           routes:
-            - id: customer
-              uri: lb://CUSTOMER
+            - id: CUSTOMER-SERVICE
+              uri: lb://CUSTOMER-SERVICE
               predicates:
                 - Path=/api/v1/customers/**
             - id: products

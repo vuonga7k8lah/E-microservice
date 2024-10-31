@@ -1,8 +1,8 @@
 server:
-    port: 8080
+    port: 8089
 spring:
     application:
-        name: customer
+        name: customer-service
     datasource:
         password: password
         url: jdbc:postgresql://localhost:5432/customer
@@ -27,5 +27,7 @@ eureka:
             defaultZone: http://localhost:8761/eureka
         fetch-registry: true
         register-with-eureka: true
-        enabled: true
-
+keycloak:
+    client_secret: svz2wuMAzKRBXebmCgxRN9hicPqYg5qM
+    client_id: vuongkma_dev
+    url: http://localhost:8080/realms/vuongkma/protocol/openid-connect/token

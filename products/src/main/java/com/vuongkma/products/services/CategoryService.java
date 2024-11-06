@@ -7,12 +7,17 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class CategoryService {
+
     @Autowired
     private CategoryRepository categoryRepository;
+
+    @Autowired
+    private KafkaProducerService kafkaProducerService;
     public boolean existsById(Long id) {
         return this.categoryRepository.existsById(id);
     }
@@ -48,6 +53,9 @@ public class CategoryService {
     }
 
     public List<CategoryProductEntity> findAll() {
+        List<String> message = new ArrayList<>();
+        message.add("cccc");
+        kafkaProducerService.sendMessage(message);
         return this.categoryRepository.findAll();
     }
 

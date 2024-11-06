@@ -26,7 +26,7 @@ const items = [
         sub: [
             {
                 title: "Add Category",
-                url: "#add",
+                url: "/categories",
                 icon: CopyPlus,
             }
         ]

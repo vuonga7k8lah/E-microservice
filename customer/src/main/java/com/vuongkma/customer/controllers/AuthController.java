@@ -8,7 +8,6 @@ import com.vuongkma.customer.dto.LoginDTO;
 import com.vuongkma.customer.helpers.APIHelper;
 import com.vuongkma.customer.helpers.ResponseFormat;
 import jakarta.validation.Valid;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -66,7 +65,7 @@ public class AuthController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response.getBody());
             }
         } catch (HttpClientErrorException ex) {
-            return ResponseEntity.status(ex.getStatusCode()).body("Error: " + ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         } catch (IllegalStateException exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
         } catch (JsonMappingException e) {

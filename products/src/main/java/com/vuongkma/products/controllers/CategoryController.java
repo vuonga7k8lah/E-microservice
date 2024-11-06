@@ -11,6 +11,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +24,7 @@ public class CategoryController {
     @Autowired
     private ModelMapper modelMapper;
 
+
     @GetMapping
     @ResponseBody
     public ResponseEntity<Object> findAll() {
@@ -31,7 +33,7 @@ public class CategoryController {
                 ResponseFormat.build(data, "Congrats, all data have been fetched successfully.")
         );
     }
-
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping(path = "{id}")
     @ResponseBody
     public ResponseEntity<Object> findOne(@PathVariable("id") Long id) {
@@ -42,7 +44,7 @@ public class CategoryController {
         ));
 
     }
-
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @DeleteMapping(path = "{id}")
     @ResponseBody
     public ResponseEntity<Object> delete(@PathVariable("id") Long id) {

@@ -17,10 +17,33 @@ spring:
     show-sql: true
   zipkin:
     base-url: http://localhost:9411
-  rabbitmq:
-    addresses: localhost:5672
+  kafka:
+    bootstrap-servers: localhost:9092
+    topic:
+      name: topic-event-1
+    consumer:
+      group-id: my-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: '*'  # Đảm bảo các package phù hợp
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    template:
+      default-topic: topic-event-1
   profiles:
     active: default
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/vuongkma
+
 eureka:
   client:
     service-url:

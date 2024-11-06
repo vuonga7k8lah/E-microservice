@@ -1,7 +1,7 @@
 import {StrictMode} from "react";
 import {createRoot} from "react-dom/client";
 import "./index.css";
-import {LoginPage, UserPage} from "./pages/index.tsx";
+import {LoginPage, UserPage,CategoryPage} from "./pages/index.tsx";
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import {ToastProvider} from "./contexts/ToastContext";
 import {ToastContainer} from "react-toastify";
@@ -20,6 +20,10 @@ const router = createBrowserRouter([
             {
                 path: "/users",
                 element: <UserPage/>,
+            },
+            {
+                path: "/categories",
+                element: <CategoryPage/>,
             }
         ]
     },

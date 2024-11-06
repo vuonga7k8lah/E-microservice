@@ -28,6 +28,6 @@ eureka:
         fetch-registry: true
         register-with-eureka: true
 keycloak:
-    client_secret: svz2wuMAzKRBXebmCgxRN9hicPqYg5qM
+    client_secret: InLBgLoIksHPIS4OKjR1x2e7rPl2tSBD
     client_id: vuongkma_dev
     url: http://localhost:8080/realms/vuongkma/protocol/openid-connect/token

@@ -1,15 +1,15 @@
-import React, {useState} from "react";
-import {useForm, SubmitHandler} from "react-hook-form";
-import {login} from "../../services/AuthService";
-import {useNavigate} from "react-router-dom";
+import React, { useState } from "react";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { login } from "../../services/AuthService";
+import { useNavigate } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
-import {useToast} from '../../contexts/ToastContext';
-import Loader from '../../components/Loader/Loader'
-import {useDispatch} from 'react-redux'
-import logo from '../../assets/logo.png';
+import { useToast } from "../../contexts/ToastContext";
+import Loader from "../../components/Loader/Loader";
+import { useDispatch } from "react-redux";
+import logo from "../../assets/logo.png";
 
 type FormData = {
-    email: string;
+    username: string;
     password: string;
 };
 
@@ -17,12 +17,12 @@ const LoginPage: React.FC = () => {
     const {
         register,
         handleSubmit,
-        formState: {errors},
+        formState: { errors },
     } = useForm<FormData>();
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const {notify} = useToast();
+    const { notify } = useToast();
     const onSubmit: SubmitHandler<FormData> = async (data) => {
         setLoading(true);
         // @ts-ignore
@@ -32,7 +32,6 @@ const LoginPage: React.FC = () => {
             navigate("/users");
         }
         setLoading(false);
-
     };
     return (
         <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
@@ -56,27 +55,27 @@ const LoginPage: React.FC = () => {
                 >
                     <div>
                         <label
-                            htmlFor="email"
+                            htmlFor="username"
                             className="block text-sm font-medium leading-6 text-gray-900"
                         >
-                            Email address
+                            Username
                         </label>
                         <div className="mt-2">
                             <input
-                                id="email"
-                                type="email"
-                                autoComplete="email"
-                                required
-                                {...register("email", {
+                                id="username"
+                                type="text"
+                                autoComplete="username"
+                                {...register("username", {
                                     required: true,
-                                    pattern: /^\S+@\S+$/i,
+                                    maxLength: 80,
                                 })}
+                                required
                                 className="block w-full rounded-md border-0 p-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                             />
                         </div>
-                        {errors.email?.type === "required" && (
+                        {errors.username?.type === "required" && (
                             <p className="text-red-600" role="alert">
-                                email is required
+                                username is required
                             </p>
                         )}
                     </div>
@@ -121,9 +120,15 @@ const LoginPage: React.FC = () => {
                     <div>
                         <button
                             type="submit"
-                            className={`${loading ? 'cursor-not-allowed' : ''} flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600`}
+                            className={`${
+                                loading ? "cursor-not-allowed" : ""
+                            } flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600`}
                         >
-                            {loading ? <Loader width={25} height={25} fill="#ff0000"/> : ''}
+                            {loading ? (
+                                <Loader width={25} height={25} fill="#ff0000" />
+                            ) : (
+                                ""
+                            )}
                             Sign in
                         </button>
                     </div>
@@ -139,7 +144,6 @@ const LoginPage: React.FC = () => {
                     </a>
                 </p>
             </div>
-
         </div>
     );
 };

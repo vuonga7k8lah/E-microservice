@@ -1,46 +1,59 @@
-import axiosInstance from "../configs/axios";
-import axios from "axios";
-import {ToastOptions} from "react-toastify";
+import { ToastOptions } from "react-toastify";
 
-import {loginSuccess} from '../redux/slice/authSlice'
-import {loginResponse} from '../types/auth.type'
+import { loginSuccess } from "../redux/slice/authSlice";
+import { loginResponse } from "../types/auth.type";
 
+import axios, { AxiosInstance } from "axios";
 
 type LoginPayload = {
-    email: string;
+    username: string;
     password: string;
 };
 
-
-const login = async (payload: LoginPayload, notify: (message: string, options?: ToastOptions) => void, dispatch: any) => {
+const login = async (
+    payload: LoginPayload,
+    notify: (message: string, options?: ToastOptions) => void,
+    dispatch: any
+) => {
     try {
-        const response = await axiosInstance.post<LoginPayload[]>("/login", payload);
+        const axiosInstance: AxiosInstance = axios.create({
+            baseURL: import.meta.env.VITE_API_URL || "http://localhost:8083/",
+            timeout: 10000, //
+            headers: {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",
+            },
+        });
+        const response = await axiosInstance.post<LoginPayload[]>(
+            "/api/v1/customers/auth",
+            payload
+        );
         if (response.status === 200) {
-            const data:loginResponse = {
+            console.log(response.data);
+
+            const data: loginResponse = {
                 // @ts-ignore
-                accessToken:response.data.data.accessToken,
+                accessToken: response.data.info.access_token,
                 // @ts-ignore
-                refreshToken:response.data.data.refreshToken,
-                user:{
-                    // @ts-ignore
-                    id:response.data.data.user.id,
-                    // @ts-ignore
-                    name:response.data.data.user.name,
-                },
-                isAuthenticated:true
-            }
+                refreshToken: response.data.info.refresh_token,
+                isAuthenticated: true,
+            };
 
             // @ts-ignore
-            notify(response.data.message || 'Login successful!', { type: 'success' });
-            dispatch(loginSuccess(data))
+            notify(response.data.message || "Login successful!", {
+                type: "success",
+            });
+            dispatch(loginSuccess(data));
             return true;
         }
     } catch (error) {
         if (axios.isAxiosError(error)) {
             if (error.response && error.response.data.message) {
-                notify(error.response.data.message, { type: 'error' });
+                notify(error.response.data.message, { type: "error" });
             } else {
-                notify('An unexpected error occurred. Please try again.', { type: 'error' });
+                notify("An unexpected error occurred. Please try again.", {
+                    type: "error",
+                });
             }
         }
         return false;

@@ -1,17 +1,33 @@
-import {Calendar, ChevronUp, CopyPlus, Home, Inbox, Search, Settings, User2} from "lucide-react"
+import {
+    Calendar,
+    ChevronUp,
+    CopyPlus,
+    Home,
+    Inbox,
+    Search,
+    Settings,
+    User2,
+} from "lucide-react";
 
 import {
     Sidebar,
-    SidebarContent, SidebarFooter,
+    SidebarContent,
+    SidebarFooter,
     SidebarGroup,
     SidebarGroupContent,
     SidebarGroupLabel,
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
-} from "@/components/ui/sidebar"
-import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
-import {useState} from "react";
+} from "@/components/ui/sidebar";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@radix-ui/react-dropdown-menu";
+import { useState } from "react";
+import { logout } from "@/redux/slice/authSlice";
 
 const items = [
     {
@@ -28,8 +44,20 @@ const items = [
                 title: "Add Category",
                 url: "/categories",
                 icon: CopyPlus,
-            }
-        ]
+            },
+        ],
+    },
+    {
+        title: "User",
+        url: "users",
+        icon: User2,
+        sub: [
+            {
+                title: "Add User",
+                url: "/users",
+                icon: CopyPlus,
+            },
+        ],
     },
     {
         title: "Calendar",
@@ -47,9 +75,15 @@ const items = [
         icon: Settings,
     },
 ];
+import { useDispatch } from "react-redux";
 
 export function AppSidebar() {
     const [openSubmenu, setOpenSubmenu] = useState(null);
+    const dispatch = useDispatch();
+    const logoutAction = () => {
+        // Logic for logging out, like dispatching an action
+        dispatch(logout());
+    };
 
     // @ts-ignore
     const toggleSubmenu = (title) => {
@@ -66,20 +100,39 @@ export function AppSidebar() {
                             {items.map((item) => (
                                 <SidebarMenuItem key={item.title}>
                                     <SidebarMenuButton asChild>
-                                        <a href={item.url} onClick={() => item.sub && toggleSubmenu(item.title)}>
+                                        <a
+                                            href={item.url}
+                                            onClick={() =>
+                                                item.sub &&
+                                                toggleSubmenu(item.title)
+                                            }
+                                        >
                                             <item.icon />
                                             <span>{item.title}</span>
-                                            {item.sub && <ChevronUp className={`ml-auto ${openSubmenu === item.title ? 'rotate-180' : ''}`} />}
+                                            {item.sub && (
+                                                <ChevronUp
+                                                    className={`ml-auto ${
+                                                        openSubmenu ===
+                                                        item.title
+                                                            ? "rotate-180"
+                                                            : ""
+                                                    }`}
+                                                />
+                                            )}
                                         </a>
                                     </SidebarMenuButton>
                                     {item.sub && openSubmenu === item.title && (
                                         <div className="pl-4">
                                             {item.sub.map((subItem) => (
-                                                <SidebarMenuItem key={subItem.title}>
+                                                <SidebarMenuItem
+                                                    key={subItem.title}
+                                                >
                                                     <SidebarMenuButton asChild>
                                                         <a href={subItem.url}>
                                                             <subItem.icon />
-                                                            <span>{subItem.title}</span>
+                                                            <span>
+                                                                {subItem.title}
+                                                            </span>
                                                         </a>
                                                     </SidebarMenuButton>
                                                 </SidebarMenuItem>
@@ -112,7 +165,7 @@ export function AppSidebar() {
                                 <DropdownMenuItem>
                                     <span>Billing</span>
                                 </DropdownMenuItem>
-                                <DropdownMenuItem>
+                                <DropdownMenuItem onClick={logoutAction}>
                                     <span>Sign out</span>
                                 </DropdownMenuItem>
                             </DropdownMenuContent>

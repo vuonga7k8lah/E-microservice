@@ -4,16 +4,27 @@ import com.vuongkma.products.dto.CategoryProductDTO;
 import com.vuongkma.products.entities.CategoryProductEntity;
 import com.vuongkma.products.helpers.APIHelper;
 import com.vuongkma.products.helpers.ResponseFormat;
+import com.vuongkma.products.helpers.enums.StatusEnum;
 import com.vuongkma.products.services.CategoryService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static ch.qos.logback.core.util.StringUtil.capitalizeFirstLetter;
 
 @Controller
 @RequestMapping(APIHelper.restRoot+"categories")
@@ -26,12 +37,28 @@ public class CategoryController {
 
 
     @GetMapping
-    @ResponseBody
-    public ResponseEntity<Object> findAll() {
-        var data = this.categoryService.findAll();
+    public ResponseEntity<Object> findAll(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String search
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<CategoryProductEntity> result = categoryService.search(search, pageable);
+        Map<String, Object> data = new HashMap<>();
+        var items = result.getContent();
+        data.put("items",items);
+        data.put("currentPage", result.getNumber());
+        data.put("totalItems", result.getTotalElements());
+        data.put("totalPages", result.getTotalPages());
         return ResponseEntity.status(HttpStatus.OK).body(
-                ResponseFormat.build(data, "Congrats, all data have been fetched successfully.")
+                ResponseFormat.build(data, "Data fetched successfully with search and pagination.")
         );
+    }
+    private String capitalizeFirstLetter(String input) {
+        if (input == null || input.isEmpty()) {
+            return input;
+        }
+        return input.substring(0, 1).toUpperCase() + input.substring(1).toLowerCase();
     }
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping(path = "{id}")
@@ -80,6 +107,10 @@ public class CategoryController {
     @PostMapping
     @ResponseBody
     public ResponseEntity<Object> create(@Valid @RequestBody CategoryProductDTO categoryProductDTO) {
+        //check status
+        if (categoryProductDTO.getStatus()!=null){
+            categoryProductDTO.setStatus(categoryProductDTO.getStatus().equals("publish")?StatusEnum.PUBLISH.toString():StatusEnum.DRAFT.toString());
+        }
         CategoryProductEntity categoryProductEntity = this.modelMapper.map(categoryProductDTO, CategoryProductEntity.class);
         var data = this.categoryService.insert(categoryProductEntity);
         return ResponseEntity.status(HttpStatus.OK).body(

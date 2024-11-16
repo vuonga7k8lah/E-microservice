@@ -17,6 +17,10 @@ spring:
               uri: lb://PRODUCT
               predicates:
                 - Path=/api/v1/products/**
+            - id: KEYCLOAK
+              uri: http://localhost:8080
+              predicates:
+                  - Path=/auth/**
 
 eureka:
     client:

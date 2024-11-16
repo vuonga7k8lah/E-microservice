@@ -57,8 +57,6 @@ services:
       - zookeeper
     networks:
       - spring
-
-
   keycloak_web:
     image: quay.io/keycloak/keycloak:23.0.7
     container_name: keycloak_web

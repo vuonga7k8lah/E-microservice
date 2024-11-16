@@ -17,6 +17,7 @@ public class CategoryProductEntity {
     private Long id;
     private String name;
     private Long parent_id;
+    @Enumerated(EnumType.STRING)
     private StatusEnum status;
     private Date created_at;
     private Date updated_at;

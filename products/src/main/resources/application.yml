@@ -9,7 +9,7 @@ spring:
     username: amigoscode
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
@@ -43,7 +43,6 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: http://localhost:8080/realms/vuongkma
-
 eureka:
   client:
     service-url:

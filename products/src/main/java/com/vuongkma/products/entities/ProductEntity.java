@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.Set;
 
 @Entity
 @Table(name = "Products")
@@ -19,7 +20,13 @@ public class ProductEntity {
     private String description;
     private Number price;
     private Integer stock_quantity;
-    private Long category_id;
+    @ManyToMany
+    @JoinTable(
+            name = "Category_Products",
+            joinColumns = @JoinColumn(name = "product_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id")
+    )
+    private Set<CategoryProductEntity> categories;
     private StatusEnum status;
     private Date created_at;
     private Date updated_at;

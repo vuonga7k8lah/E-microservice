@@ -8,9 +8,10 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="apigw" />
-        <module name="eureka-server" />
         <module name="amqp" />
         <module name="blogs" />
+        <module name="media" />
+        <module name="eureka-server" />
         <module name="products" />
         <module name="customer" />
       </profile>
@@ -27,6 +28,7 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="blogs" options="-parameters" />
       <module name="customer" options="-parameters" />
+      <module name="media" options="-parameters" />
       <module name="products" options="-parameters" />
     </option>
   </component>

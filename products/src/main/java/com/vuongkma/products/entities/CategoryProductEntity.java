@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.Set;
 
 @Entity
 @Table(name = "Category_Products")
@@ -21,6 +22,8 @@ public class CategoryProductEntity {
     private StatusEnum status;
     private Date created_at;
     private Date updated_at;
+    @ManyToMany(mappedBy = "categories")
+    private Set<ProductEntity> products;
     @PrePersist
     protected void onCreate() {
         created_at = new Date();

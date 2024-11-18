@@ -22,9 +22,6 @@ import org.springframework.data.domain.PageRequest;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
-
-import static ch.qos.logback.core.util.StringUtil.capitalizeFirstLetter;
 
 @Controller
 @RequestMapping(APIHelper.restRoot+"categories")

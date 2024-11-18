@@ -1,0 +1,65 @@
+server:
+  port: 8111
+spring:
+  application:
+    name: MEDIA
+  datasource:
+    password: password
+    url: jdbc:postgresql://localhost:5432/media
+    username: amigoscode
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show-sql: true
+  zipkin:
+    base-url: http://localhost:9411
+  kafka:
+    bootstrap-servers: localhost:9092
+    topic:
+      name: topic-event-1
+    consumer:
+      group-id: my-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: '*'  # Đảm bảo các package phù hợp
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    template:
+      default-topic: topic-event-1
+  profiles:
+    active: default
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/vuongkma
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+    fetch-registry: true
+    register-with-eureka: true
+    enabled: true
+  instance:
+    prefer-ip-address: true
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: swagger-ui-custom.html
+    operationsSorter: method
+cloudinary:
+  cloud_name: dgfgazqbx
+  api_key: 298646637777182
+  api_secret: aSYZ2bL1MSZIxLcTL1-9Uj3vgK8
+  url: CLOUDINARY_URL=cloudinary://298646637777182:aSYZ2bL1MSZIxLcTL1-9Uj3vgK8@dgfgazqbx

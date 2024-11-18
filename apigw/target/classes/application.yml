@@ -20,7 +20,11 @@ spring:
             - id: KEYCLOAK
               uri: http://localhost:8080
               predicates:
-                  - Path=/auth/**
+                - Path=/auth/**
+            - id: MEDIA
+              uri: lb://MEDIA
+              predicates:
+                - Path=/api/v1/media/**
 
 eureka:
     client:

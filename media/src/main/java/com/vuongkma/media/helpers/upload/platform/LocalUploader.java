@@ -15,10 +15,10 @@ import java.util.Map;
 @Component
 public class LocalUploader implements UploadStrategy {
 
-    private MultipartFile[] files;
+    private List<MultipartFile> files;
 
     @Override
-    public UploadStrategy setFile(MultipartFile[] files) {
+    public UploadStrategy setFile(List<MultipartFile> files) {
         this.files = files;
         return this;
     }

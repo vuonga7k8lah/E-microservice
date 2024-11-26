@@ -20,8 +20,6 @@ public class CategoryService {
     @Autowired
     private CategoryRepository categoryRepository;
 
-    @Autowired
-    private KafkaProducerService kafkaProducerService;
     public boolean existsById(Long id) {
         return this.categoryRepository.existsById(id);
     }
@@ -42,8 +40,8 @@ public class CategoryService {
             entity.setStatus(data.getStatus());
         }
 
-        if (data.getParent_id() != null) {
-            entity.setParent_id(data.getParent_id());
+        if (data.getParentId() != null) {
+            entity.setParentId(data.getParentId());
         }
         this.categoryRepository.save(entity);
         return entity;
@@ -63,9 +61,6 @@ public class CategoryService {
         return categoryRepository.searchByName(search, pageable);
     }
     public List<CategoryProductEntity> findAll() {
-        List<String> message = new ArrayList<>();
-        message.add("cccc");
-        kafkaProducerService.sendMessage(message);
         return this.categoryRepository.findAll();
     }
 

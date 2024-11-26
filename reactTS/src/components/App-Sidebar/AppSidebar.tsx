@@ -4,8 +4,10 @@ import {
     CopyPlus,
     Home,
     Inbox,
+    Rocket,
     Search,
     Settings,
+    TableProperties,
     User2,
 } from "lucide-react";
 
@@ -43,6 +45,23 @@ const items = [
             {
                 title: "Add Category",
                 url: "/categories",
+                icon: CopyPlus,
+            },
+        ],
+    },
+    {
+        title: "Product",
+        url: "#",
+        icon: Rocket,
+        sub: [
+            {
+                title: "List Product",
+                url: "/products",
+                icon: TableProperties,
+            },
+            {
+                title: "Add Product",
+                url: "/products/add",
                 icon: CopyPlus,
             },
         ],

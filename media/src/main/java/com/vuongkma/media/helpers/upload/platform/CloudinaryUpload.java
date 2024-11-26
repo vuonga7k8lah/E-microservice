@@ -17,10 +17,10 @@ public class CloudinaryUpload implements UploadStrategy {
     @Autowired
     private Cloudinary cloudinary;
 
-    private MultipartFile[] files;
+    private List<MultipartFile> files;
 
     @Override
-    public UploadStrategy setFile(MultipartFile[] files) {
+    public UploadStrategy setFile(List<MultipartFile> files) {
         this.files = files;
         return this;
     }
@@ -41,6 +41,8 @@ public class CloudinaryUpload implements UploadStrategy {
                 String url = uploadResult.get("secure_url").toString();
                 Map<String, String> fileData = new HashMap<>();
                 fileData.put("url", url);
+                fileData.put("name", file.getOriginalFilename());
+                fileData.put("type", file.getContentType());
                 uploadedFiles.add(fileData);
 
             } catch (IOException e) {

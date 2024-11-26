@@ -20,7 +20,7 @@ spring:
   kafka:
     bootstrap-servers: localhost:9092
     topic:
-      name: topic-event-1
+      name: media-product-image-create
     consumer:
       group-id: my-group
       auto-offset-reset: earliest
@@ -33,7 +33,7 @@ spring:
               packages: '*'  # Đảm bảo các package phù hợp
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonDeserializer
     template:
       default-topic: topic-event-1
   profiles:

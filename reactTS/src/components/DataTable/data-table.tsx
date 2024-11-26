@@ -21,6 +21,8 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
 import {
     Select,
     SelectContent,
@@ -42,6 +44,9 @@ import {
     Plus,
     Upload,
     X,
+    Bold,
+    Italic,
+    List,
 } from "lucide-react";
 
 interface Column<T> {
@@ -69,9 +74,66 @@ interface FormField<T> {
         | "radio"
         | "checkbox"
         | "image"
+        | "richText"
         | "multipleImages";
     options?: { value: string; label: string }[];
 }
+const RichTextEditor = ({
+    defaultValue,
+    onChange,
+}: {
+    defaultValue?: string;
+    onChange: (value: string) => void;
+}) => {
+    const editor = useEditor({
+        extensions: [StarterKit],
+        content: defaultValue,
+        onUpdate: ({ editor }) => {
+            onChange(editor.getHTML());
+        },
+    });
+
+    if (!editor) {
+        return null;
+    }
+
+    return (
+        <div className="border rounded-md">
+            <div className="border-b p-2 flex gap-2">
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => editor.chain().focus().toggleBold().run()}
+                    className={editor.isActive("bold") ? "bg-muted" : ""}
+                >
+                    <Bold className="h-4 w-4" />
+                </Button>
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => editor.chain().focus().toggleItalic().run()}
+                    className={editor.isActive("italic") ? "bg-muted" : ""}
+                >
+                    <Italic className="h-4 w-4" />
+                </Button>
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() =>
+                        editor.chain().focus().toggleBulletList().run()
+                    }
+                    className={editor.isActive("bulletList") ? "bg-muted" : ""}
+                >
+                    <List className="h-4 w-4" />
+                </Button>
+            </div>
+            <EditorContent
+                editor={editor}
+                className="prose prose-sm max-w-none p-4"
+            />
+        </div>
+    );
+};
 
 interface DataTableProps<T> {
     data: T[];
@@ -101,6 +163,9 @@ export function DataTable<T extends { id: string }>({
     const [itemsPerPage, setItemsPerPage] = useState(5);
     const [uploadedImages, setUploadedImages] = useState<{
         [key: string]: File[];
+    }>({});
+    const [richTextValues, setRichTextValues] = useState<{
+        [key: string]: string;
     }>({});
 
     const debouncedSearch = useCallback(
@@ -135,6 +200,7 @@ export function DataTable<T extends { id: string }>({
         setEditingItem(item || {});
         setIsModalOpen(true);
         setUploadedImages({});
+        setRichTextValues({});
     };
 
     const handleCloseModal = () => {
@@ -150,6 +216,10 @@ export function DataTable<T extends { id: string }>({
         formFields.forEach((field) => {
             if (field.type === "image" || field.type === "multipleImages") {
                 newItem[field.key] = uploadedImages[
+                    field.key as string
+                ] as T[keyof T];
+            } else if (field.type === "richText") {
+                newItem[field.key] = richTextValues[
                     field.key as string
                 ] as T[keyof T];
             } else {
@@ -472,97 +542,125 @@ export function DataTable<T extends { id: string }>({
             </div>
 
             <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>
-                            {editingItem?.id ? "Edit Item" : "Add New Item"}
-                        </DialogTitle>
-                    </DialogHeader>
-                    <form onSubmit={handleSave} className="space-y-4">
-                        {formFields.map((field) => (
-                            <div
-                                key={field.key as string}
-                                className="space-y-2"
-                            >
-                                <Label htmlFor={field.key as string}>
-                                    {field.label}
-                                </Label>
-                                {field.type === "select" ? (
-                                    <Select
-                                        name={field.key as string}
-                                        defaultValue={
-                                            editingItem?.[field.key] as string
-                                        }
-                                    >
-                                        <SelectTrigger>
-                                            <SelectValue
-                                                placeholder={`Select ${field.label}`}
-                                            />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {field.options?.map((option) => (
-                                                <SelectItem
-                                                    key={option.value}
-                                                    value={option.value}
-                                                >
-                                                    {option.label}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                ) : field.type === "radio" ? (
-                                    <RadioGroup
-                                        defaultValue={
-                                            editingItem?.[field.key] as string
-                                        }
-                                    >
-                                        {field.options?.map((option) => (
-                                            <div
-                                                key={option.value}
-                                                className="flex items-center space-x-2"
-                                            >
-                                                <RadioGroupItem
-                                                    value={option.value}
-                                                    id={`${field.key}-${option.value}`}
-                                                    name={field.key as string}
+                <DialogContent className="max-w-2xl h-[80vh] flex flex-col">
+                    <div className="flex-grow overflow-y-auto pr-6">
+                        <DialogHeader>
+                            <DialogTitle>
+                                {editingItem?.id ? "Edit Item" : "Add New Item"}
+                            </DialogTitle>
+                        </DialogHeader>
+                        <form onSubmit={handleSave} className="space-y-4">
+                            {formFields.map((field) => (
+                                <div
+                                    key={field.key as string}
+                                    className="space-y-2"
+                                >
+                                    <Label htmlFor={field.key as string}>
+                                        {field.label}
+                                    </Label>
+                                    {field.type === "select" ? (
+                                        <Select
+                                            name={field.key as string}
+                                            defaultValue={
+                                                editingItem?.[
+                                                    field.key
+                                                ] as string
+                                            }
+                                        >
+                                            <SelectTrigger>
+                                                <SelectValue
+                                                    placeholder={`Select ${field.label}`}
                                                 />
-                                                <Label
-                                                    htmlFor={`${field.key}-${option.value}`}
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {field.options?.map(
+                                                    (option) => (
+                                                        <SelectItem
+                                                            key={option.value}
+                                                            value={option.value}
+                                                        >
+                                                            {option.label}
+                                                        </SelectItem>
+                                                    )
+                                                )}
+                                            </SelectContent>
+                                        </Select>
+                                    ) : field.type === "radio" ? (
+                                        <RadioGroup
+                                            defaultValue={
+                                                editingItem?.[
+                                                    field.key
+                                                ] as string
+                                            }
+                                        >
+                                            {field.options?.map((option) => (
+                                                <div
+                                                    key={option.value}
+                                                    className="flex items-center space-x-2"
                                                 >
-                                                    {option.label}
-                                                </Label>
-                                            </div>
-                                        ))}
-                                    </RadioGroup>
-                                ) : field.type === "image" ||
-                                  field.type === "multipleImages" ? (
-                                    <>
-                                        <ImageDropzone
-                                            fieldKey={field.key as string}
-                                            multiple={
-                                                field.type === "multipleImages"
+                                                    <RadioGroupItem
+                                                        value={option.value}
+                                                        id={`${field.key}-${option.value}`}
+                                                        name={
+                                                            field.key as string
+                                                        }
+                                                    />
+                                                    <Label
+                                                        htmlFor={`${field.key}-${option.value}`}
+                                                    >
+                                                        {option.label}
+                                                    </Label>
+                                                </div>
+                                            ))}
+                                        </RadioGroup>
+                                    ) : field.type === "image" ||
+                                      field.type === "multipleImages" ? (
+                                        <>
+                                            <ImageDropzone
+                                                fieldKey={field.key as string}
+                                                multiple={
+                                                    field.type ===
+                                                    "multipleImages"
+                                                }
+                                            />
+                                            <ImagePreview
+                                                fieldKey={field.key as string}
+                                            />
+                                        </>
+                                    ) : field.type === "richText" ? (
+                                        <RichTextEditor
+                                            defaultValue={
+                                                editingItem?.[
+                                                    field.key
+                                                ] as string
+                                            }
+                                            onChange={(value) => {
+                                                setRichTextValues((prev) => ({
+                                                    ...prev,
+                                                    [field.key as string]:
+                                                        value,
+                                                }));
+                                            }}
+                                        />
+                                    ) : (
+                                        <Input
+                                            type={field.type}
+                                            id={field.key as string}
+                                            name={field.key as string}
+                                            defaultValue={
+                                                editingItem?.[
+                                                    field.key
+                                                ] as string
                                             }
                                         />
-                                        <ImagePreview
-                                            fieldKey={field.key as string}
-                                        />
-                                    </>
-                                ) : (
-                                    <Input
-                                        type={field.type}
-                                        id={field.key as string}
-                                        name={field.key as string}
-                                        defaultValue={
-                                            editingItem?.[field.key] as string
-                                        }
-                                    />
-                                )}
-                            </div>
-                        ))}
-                        <Button type="submit" className="w-full">
-                            {editingItem?.id ? "Save Changes" : "Add Item"}
-                        </Button>
-                    </form>
+                                    )}
+                                </div>
+                            ))}
+                            <Button type="submit" className="w-full">
+                                {editingItem?.id ? "Save Changes" : "Add Item"}
+                            </Button>
+                        </form>
+                    </div>
                 </DialogContent>
             </Dialog>
         </div>

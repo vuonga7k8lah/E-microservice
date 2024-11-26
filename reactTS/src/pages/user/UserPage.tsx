@@ -48,12 +48,26 @@ const columns = [
     { key: "location", title: "Location" },
     { key: "activity", title: "Activity" },
 ];
+const formFields = [
+    { key: "name", label: "Name", type: "text" as const },
+    {
+        key: "status",
+        label: "Status",
+        type: "select" as const,
+        options: [
+            { value: "PUBLISH", label: "Publish" },
+            { value: "DRAFT", label: "Draft" },
+        ],
+    },
+    { key: "parent_id", label: "Category Parent", type: "number" as const },
+];
 
 export default function UserPage() {
     return (
         <DataTable
             data={users}
             columns={columns}
+            formFields={formFields}
             title="Team Crew"
             subtitle="Manage your team members and their roles"
             onDelete={(ids) => console.log("Delete users:", ids)}

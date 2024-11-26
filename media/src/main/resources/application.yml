@@ -20,9 +20,9 @@ spring:
   kafka:
     bootstrap-servers: localhost:9092
     topic:
-      name: topic-event-1
+      name: media-product-image-create-1
     consumer:
-      group-id: my-group
+      group-id: media-product
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
@@ -30,12 +30,12 @@ spring:
         spring:
           json:
             trusted:
-              packages: '*'  # Đảm bảo các package phù hợp
+              packages: '*'
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonDeserializer
     template:
-      default-topic: topic-event-1
+      default-topic: media-product-event
   profiles:
     active: default
   security:
@@ -43,6 +43,11 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: http://localhost:8080/realms/vuongkma
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 20MB
+      max-request-size: 50MB
 eureka:
   client:
     service-url:

@@ -1,6 +1,6 @@
 package com.vuongkma.products.entities;
 
-import com.vuongkma.products.helpers.enums.StatusEnum;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,27 +9,37 @@ import java.util.Date;
 import java.util.Set;
 
 @Entity
-@Table(name = "Products")
+@Table(name = "products")
 @Getter
 @Setter
 public class ProductEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String name;
     private String description;
-    private Number price;
-    private Integer stock_quantity;
-    @ManyToMany
+
+    private Integer price;
+
+    private Integer stockQuantity;
+
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(
-            name = "Category_Products",
+            name = "category_products_products",
             joinColumns = @JoinColumn(name = "product_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
+    @JsonManagedReference
     private Set<CategoryProductEntity> categories;
-    private StatusEnum status;
+
+    private String status;
+    private String thumbnail;
+    private String images;
+
     private Date created_at;
     private Date updated_at;
+
     @PrePersist
     protected void onCreate() {
         created_at = new Date();

@@ -16,8 +16,9 @@ public class ProductEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    @Column(columnDefinition = "TEXT")
     private String name;
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     private Integer price;
@@ -34,7 +35,9 @@ public class ProductEntity {
     private Set<CategoryProductEntity> categories;
 
     private String status;
+    @Column(columnDefinition = "TEXT")
     private String thumbnail;
+    @Column(columnDefinition = "TEXT")
     private String images;
 
     private Date created_at;

@@ -8,6 +8,7 @@ import { RootState } from "@/redux/store";
 import { useSelector } from "react-redux";
 import { DataTable } from "@/components/DataTable/data-table";
 import { Badge } from "@/components/ui/badge";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 export default function ListUser() {
     const [pageIndex, setPageIndex] = useState(0);
@@ -21,9 +22,10 @@ export default function ListUser() {
         richDescription: string;
         status: "In Stock" | "Out of Stock" | "Low Stock";
         category: string;
-        thumbnail: File | null;
-        gallery: File[];
+        thumbnail: string;
+        gallery: string;
         price: string;
+        stock_quantity: string;
     }
     const initialProducts: Product[] = [
         {
@@ -70,26 +72,32 @@ export default function ListUser() {
 
     const columns = [
         { key: "name", title: "Name" },
-        { key: "description", title: "Description" },
+        {
+            key: "thumbnail",
+            title: "Thumbnail",
+            render: (value: Product["thumbnail"]) => (
+                <AspectRatio ratio={5 / 5} className="bg-muted">
+                    <img
+                        src={value ?? ""}
+                        alt="Photo by Drew Beamer"
+                        className="h-full w-full rounded-md object-cover"
+                    />
+                </AspectRatio>
+            ),
+        },
         {
             key: "status",
             title: "Status",
             render: (value: Product["status"]) => (
                 <Badge
-                    variant={
-                        value === "In Stock"
-                            ? "success"
-                            : value === "Low Stock"
-                            ? "warning"
-                            : "destructive"
-                    }
+                    variant={value === "PUBLISH" ? "success" : "destructive"}
                 >
                     {value}
                 </Badge>
             ),
         },
-        { key: "category", title: "Category" },
         { key: "price", title: "Price" },
+        { key: "qty", title: "Quantity" },
     ];
     const handlePageChange = useCallback((newPage: number) => {
         setPageIndex(newPage);
@@ -103,23 +111,41 @@ export default function ListUser() {
         });
 
     const {
-        data: dataUserList,
-        error,
-        mutate,
+        data: dataList,
+        error: errorDataList,
+        mutate: mutateDataList,
     } = useSWR(
         token
             ? [`/api/v1/products?limit=${userPerPage}&page=${pageIndex}`, token]
             : null,
         ([url, token]) => fetcher(url, token)
     );
+    const {
+        data: categoryOption,
+        error,
+        mutate,
+    } = useSWR(
+        token
+            ? [
+                  `/api/v1/products/categories?limit=${userPerPage}&page=${pageIndex}`,
+                  token,
+              ]
+            : null,
+        ([url, token]) => fetcher(url, token)
+    );
 
     const data =
-        dataUserList?.data?.info !== undefined
-            ? dataUserList?.data?.info.items.map((data: any) => ({
+        dataList?.data?.info !== undefined
+            ? dataList?.data?.info.items.map((data: any) => ({
                   id: data.id,
                   name: data.name,
-                  parent_id: data.parent_id,
+                  description: data.description,
+                  thumbnail: data.thumbnail,
+                  price: data.price + "$",
+                  qty: data.stockQuantity,
                   status: data.status,
+                  gallery: data.images,
+                  categories: data.categories,
                   activity: new Date(data.created_at).toLocaleDateString(
                       "en-GB"
                   ),
@@ -128,13 +154,9 @@ export default function ListUser() {
 
     const formFields = [
         { key: "name", label: "Name", type: "text" as const },
+        { key: "stock_quantity", label: "Quantity", type: "text" as const },
         {
             key: "description",
-            label: "Short Description",
-            type: "text" as const,
-        },
-        {
-            key: "richDescription",
             label: "Detailed Description",
             type: "richText" as const,
         },
@@ -147,7 +169,20 @@ export default function ListUser() {
                 { value: "DRAFT", label: "Draft" },
             ],
         },
-        { key: "category", label: "Category", type: "text" as const },
+        {
+            key: "category",
+            label: "Category",
+            type: "select" as const,
+            options: categoryOption?.data?.info.items.map((category: any) => {
+                return {
+                    value: category.id.toString(),
+                    label: category.name,
+                };
+            }) ?? [
+                { value: "PUBLISH", label: "Publish" },
+                { value: "DRAFT", label: "Draft" },
+            ],
+        },
         { key: "price", label: "Price", type: "text" as const },
         {
             key: "thumbnail",
@@ -155,7 +190,7 @@ export default function ListUser() {
             type: "image" as const,
         },
         {
-            key: "gallery",
+            key: "images",
             label: "Product Gallery",
             type: "multipleImages" as const,
         },
@@ -171,11 +206,9 @@ export default function ListUser() {
     };
 
     const handleSaveOrUpdate = async (data: Partial<Product>) => {
-        console.log(data);
-
         if (data.id) {
             const response = await axiosInstance.put(
-                `/api/v1/products/categories/${data.id}`,
+                `/api/v1/products/${data.id}`,
                 data,
                 {
                     headers: {
@@ -192,7 +225,7 @@ export default function ListUser() {
         } else {
             try {
                 const response = await axiosInstance.post(
-                    `/api/v1/products/categories`,
+                    `/api/v1/products`,
                     data,
                     {
                         headers: {
@@ -210,6 +243,7 @@ export default function ListUser() {
                 console.error("Error updating data:", error);
             }
         }
+        mutateDataList();
     };
 
     return (

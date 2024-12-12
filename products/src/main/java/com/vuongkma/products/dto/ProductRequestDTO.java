@@ -12,8 +12,8 @@ public class ProductRequestDTO {
     private Integer price;
     private Integer stock_quantity;
     private StatusEnum status;
-    private String thumbnail;
+    private List<String> thumbnail;
     private List<String> images;
-    private List<Integer> categories;
+    private String category;
 
 }

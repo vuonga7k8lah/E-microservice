@@ -2,6 +2,8 @@
 
 import { useState, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
 import {
     Table,
     TableBody,
@@ -21,8 +23,6 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { useEditor, EditorContent } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
 import {
     Select,
     SelectContent,
@@ -49,11 +49,6 @@ import {
     List,
 } from "lucide-react";
 
-interface Column<T> {
-    key: keyof T;
-    title: string;
-    render?: (value: T[keyof T], item: T) => React.ReactNode;
-}
 function debounce<F extends (...args: any[]) => any>(
     func: F,
     wait: number
@@ -64,6 +59,14 @@ function debounce<F extends (...args: any[]) => any>(
         timeout = setTimeout(() => func(...args), wait);
     };
 }
+
+interface Column<T> {
+    key: keyof T;
+    title: string;
+    render?: (value: T[keyof T], item: T) => React.ReactNode;
+    isImage?: boolean;
+}
+
 interface FormField<T> {
     key: keyof T;
     label: string;
@@ -74,10 +77,21 @@ interface FormField<T> {
         | "radio"
         | "checkbox"
         | "image"
-        | "richText"
-        | "multipleImages";
+        | "multipleImages"
+        | "richText";
     options?: { value: string; label: string }[];
 }
+
+interface DataTableProps<T> {
+    data: T[];
+    columns: Column<T>[];
+    formFields: FormField<T>[];
+    title: string;
+    subtitle?: string;
+    onDelete?: (ids: string[]) => void;
+    onSave: (item: Partial<T>) => void;
+}
+
 const RichTextEditor = ({
     defaultValue,
     onChange,
@@ -135,16 +149,6 @@ const RichTextEditor = ({
     );
 };
 
-interface DataTableProps<T> {
-    data: T[];
-    columns: Column<T>[];
-    formFields: FormField<T>[];
-    title: string;
-    subtitle?: string;
-    onDelete?: (ids: string[]) => void;
-    onSave: (item: Partial<T>) => void;
-}
-
 export function DataTable<T extends { id: string }>({
     data,
     columns,
@@ -162,7 +166,7 @@ export function DataTable<T extends { id: string }>({
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(5);
     const [uploadedImages, setUploadedImages] = useState<{
-        [key: string]: File[];
+        [key: string]: string[];
     }>({});
     const [richTextValues, setRichTextValues] = useState<{
         [key: string]: string;
@@ -207,6 +211,7 @@ export function DataTable<T extends { id: string }>({
         setEditingItem(null);
         setIsModalOpen(false);
         setUploadedImages({});
+        setRichTextValues({});
     };
 
     const handleSave = (e: React.FormEvent<HTMLFormElement>) => {
@@ -217,7 +222,7 @@ export function DataTable<T extends { id: string }>({
             if (field.type === "image" || field.type === "multipleImages") {
                 newItem[field.key] = uploadedImages[
                     field.key as string
-                ] as T[keyof T];
+                ] as unknown as T[keyof T];
             } else if (field.type === "richText") {
                 newItem[field.key] = richTextValues[
                     field.key as string
@@ -239,7 +244,7 @@ export function DataTable<T extends { id: string }>({
         Object.values(item).some(
             (value) =>
                 typeof value === "string" &&
-                value.toLowerCase().includes(searchTerm.toLowerCase())
+                value.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
         )
     );
 
@@ -265,13 +270,28 @@ export function DataTable<T extends { id: string }>({
         fieldKey: string;
         multiple: boolean;
     }) => {
+        const url = import.meta.env.VITE_API_URL || "http://localhost:8083/";
         const onDrop = useCallback(
-            (acceptedFiles: File[]) => {
+            async (acceptedFiles: File[]) => {
+                const uploadPromises = acceptedFiles.map(async (file) => {
+                    const formData = new FormData();
+                    formData.append("files", file);
+
+                    const response = await fetch(url + "api/v1/media", {
+                        method: "POST",
+                        body: formData,
+                    });
+                    const data = await response.json();
+                    return data.info[0].url; // Get the first URL from the response
+                });
+
+                const urls = await Promise.all(uploadPromises);
+
                 setUploadedImages((prev) => ({
                     ...prev,
                     [fieldKey]: multiple
-                        ? [...(prev[fieldKey] || []), ...acceptedFiles]
-                        : [acceptedFiles[0]],
+                        ? [...(prev[fieldKey] || []), ...urls]
+                        : [urls[0]],
                 }));
             },
             [fieldKey, multiple]
@@ -306,16 +326,17 @@ export function DataTable<T extends { id: string }>({
         const images = uploadedImages[fieldKey] || [];
         return (
             <div className="mt-2 flex flex-wrap gap-2">
-                {images.map((file, index) => (
+                {images.map((url, index) => (
                     <div key={index} className="relative">
                         <img
-                            src={URL.createObjectURL(file)}
+                            src={url}
                             alt={`Preview ${index + 1}`}
                             width={100}
                             height={100}
                             className="object-cover rounded-md"
                         />
                         <button
+                            type="button"
                             onClick={() => {
                                 setUploadedImages((prev) => ({
                                     ...prev,
@@ -436,14 +457,24 @@ export function DataTable<T extends { id: string }>({
                                 )}
                                 {columns.map((column) => (
                                     <TableCell key={column.key as string}>
-                                        {column.render
-                                            ? column.render(
-                                                  item[column.key],
-                                                  item
-                                              )
-                                            : (item[
-                                                  column.key
-                                              ] as React.ReactNode)}
+                                        {column.isImage ? (
+                                            <img
+                                                src={item[column.key] as string}
+                                                alt={`Image for ${column.title}`}
+                                                width={50}
+                                                height={50}
+                                                className="object-cover rounded-md"
+                                            />
+                                        ) : column.render ? (
+                                            column.render(
+                                                item[column.key],
+                                                item
+                                            )
+                                        ) : (
+                                            (item[
+                                                column.key
+                                            ] as React.ReactNode)
+                                        )}
                                     </TableCell>
                                 ))}
                                 <TableCell>
@@ -625,6 +656,13 @@ export function DataTable<T extends { id: string }>({
                                             />
                                             <ImagePreview
                                                 fieldKey={field.key as string}
+                                            />
+                                            <input
+                                                type="hidden"
+                                                name={field.key as string}
+                                                value={uploadedImages[
+                                                    field.key as string
+                                                ]?.join(",")}
                                             />
                                         </>
                                     ) : field.type === "richText" ? (

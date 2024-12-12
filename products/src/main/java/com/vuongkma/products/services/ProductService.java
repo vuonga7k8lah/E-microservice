@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -35,12 +36,11 @@ public class ProductService {
         productEntity.setPrice(productRequestDTO.getPrice());
         productEntity.setStockQuantity(productRequestDTO.getStock_quantity());
         productEntity.setStatus(productRequestDTO.getStatus().name());
-        productEntity.setThumbnail(productRequestDTO.getThumbnail());
+        productEntity.setThumbnail(productRequestDTO.getThumbnail().get(0));
         productEntity.setImages(String.join(",", productRequestDTO.getImages()));
-        if(!productRequestDTO.getCategories().isEmpty()){
-            Set<CategoryProductEntity> categories = productRequestDTO.getCategories().stream()
-                    .map(categoryId -> categoryService.findOne(Long.valueOf(categoryId)))
-                    .collect(Collectors.toSet());
+        if(!productRequestDTO.getCategory().isEmpty()){
+            Set<CategoryProductEntity> categories = new HashSet<>();
+            categories.add(categoryService.findOne(Long.valueOf(productRequestDTO.getCategory())));
             productEntity.setCategories(categories);
         }
 

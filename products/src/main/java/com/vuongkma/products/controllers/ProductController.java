@@ -8,6 +8,7 @@ import com.vuongkma.products.services.ProductService;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -58,4 +59,24 @@ public class ProductController {
                 ResponseFormat.build(data, "Data fetched successfully with search and pagination.")
         );
     }
+    @PutMapping("/{id}/stock")
+    public ResponseEntity<Object> updateProduct(@PathVariable("id") int id,Integer quantity){
+        var data = productService.updateStock(id,quantity);
+        return ResponseEntity.status(HttpStatus.OK).body(
+                ResponseFormat.build(
+                        data,
+                        "Congrats, the data has been updated successfully."
+                )
+        );
+    };
+    @GetMapping("/{id}")
+    public ResponseEntity<Object> getProduct(@PathVariable("id") int id){
+        var data = productService.findOne((long) id);
+        return ResponseEntity.status(HttpStatus.OK).body(
+                ResponseFormat.build(
+                        data,
+                        "Congrats, the data has been get successfully."
+                )
+        );
+    };
 }

@@ -1,4 +1,4 @@
-package com.vuongkma.customer.helpers;
+package com.vuongkma.blogs.helpers;
 
 import java.util.HashMap;
 import java.util.List;

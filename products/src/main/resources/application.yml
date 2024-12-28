@@ -21,8 +21,9 @@ spring:
     bootstrap-servers: localhost:9092
     topic:
       name: media-product-image-create
+      update-stock-quantity: order-item-create-success
     consumer:
-      group-id: my-group
+      group-id: order-item
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
@@ -30,7 +31,7 @@ spring:
         spring:
           json:
             trusted:
-              packages: '*'  # Đảm bảo các package phù hợp
+              packages: com.vuongkma.orders_service.entities
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonDeserializer

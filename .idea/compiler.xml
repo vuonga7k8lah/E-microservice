@@ -15,20 +15,22 @@
         <module name="products" />
         <module name="customer" />
       </profile>
+      <profile name="Annotation profile for vuongkma" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <processorPath>
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
+        </processorPath>
+        <module name="orders-service" />
+      </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="amigosservices" target="17" />
-      <module name="clients" target="17" />
-      <module name="customer33" target="17" />
-      <module name="fraud" target="17" />
-      <module name="notification" target="17" />
-    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="blogs" options="-parameters" />
       <module name="customer" options="-parameters" />
       <module name="media" options="-parameters" />
+      <module name="orders-service" options="-parameters" />
       <module name="products" options="-parameters" />
     </option>
   </component>

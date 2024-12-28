@@ -15,7 +15,7 @@ public class ResponseFormat {
     public static <T> Map<String, Object> build(T data, String message) {
         Map<String, Object> map = new HashMap<>();
         map.put("message", message);
-        map.put("info", data);
+        map.put("data", data);
 
         return map;
     }

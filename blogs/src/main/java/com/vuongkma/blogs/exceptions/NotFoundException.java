@@ -1,4 +1,4 @@
-package com.vuongkma.customer.exceptions;
+package com.vuongkma.blogs.exceptions;
 
 public class NotFoundException extends RuntimeException{
     public NotFoundException(String message){

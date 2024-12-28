@@ -1,4 +1,4 @@
-package com.vuongkma.customer.helpers;
+package com.vuongkma.blogs.helpers;
 
 public class APIHelper {
     public static final String restNamespace = "customers";

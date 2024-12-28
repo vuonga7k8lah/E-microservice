@@ -4,6 +4,7 @@ import com.vuongkma.products.dto.ProductRequestDTO;
 import com.vuongkma.products.entities.CategoryProductEntity;
 import com.vuongkma.products.entities.ProductEntity;
 import com.vuongkma.products.repositories.ProductRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,20 +16,23 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class ProductService {
     @Autowired
     private ProductRepository productRepository;
 
     @Autowired
     private CategoryService categoryService;
+
     public Page<ProductEntity> search(String search, Pageable pageable) {
         if (search == null || search.isBlank()) {
             return productRepository.findAll(pageable);
         }
         return productRepository.searchByName(search, pageable);
     }
+
     @Transactional
-    public ProductEntity create(ProductRequestDTO productRequestDTO){
+    public ProductEntity create(ProductRequestDTO productRequestDTO) {
         //handle entity
         ProductEntity productEntity = new ProductEntity();
         productEntity.setName(productRequestDTO.getName());
@@ -38,12 +42,24 @@ public class ProductService {
         productEntity.setStatus(productRequestDTO.getStatus().name());
         productEntity.setThumbnail(productRequestDTO.getThumbnail().get(0));
         productEntity.setImages(String.join(",", productRequestDTO.getImages()));
-        if(!productRequestDTO.getCategory().isEmpty()){
+        if (!productRequestDTO.getCategory().isEmpty()) {
             Set<CategoryProductEntity> categories = new HashSet<>();
             categories.add(categoryService.findOne(Long.valueOf(productRequestDTO.getCategory())));
             productEntity.setCategories(categories);
         }
 
         return this.productRepository.save(productEntity);
+    }
+
+    public ProductEntity findOne(Long id) {
+        return productRepository.findById(id).orElseThrow();
+    }
+
+    @Transactional
+    public ProductEntity updateStock(Integer id, Integer quantity) {
+        ProductEntity productEntity = productRepository.findById(id.longValue()).orElseThrow();
+        productEntity.setStockQuantity(productEntity.getStockQuantity() - quantity);
+        log.info("update stock quantity of product: " + productEntity.getName() + " to " + productEntity.getStockQuantity());
+        return productRepository.save(productEntity);
     }
 }

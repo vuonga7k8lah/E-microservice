@@ -17,6 +17,7 @@
         <module>customer</module>
         <module>blogs</module>
         <module>media</module>
+        <module>orders-service</module>
     </modules>
 
     <name>vuongkma</name>

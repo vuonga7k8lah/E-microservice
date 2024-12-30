@@ -7,10 +7,12 @@ import {
     CategoryPage,
     ProductPage,
 } from "./pages/index.tsx";
+import Home from "./pages/shop/HomePage";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { ToastProvider } from "./contexts/ToastContext";
 import { ToastContainer } from "react-toastify";
 import Layout from "./components/Layout/Layout";
+import Shop from "./components/Layout/Shop.tsx";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import { store, persistor } from "./redux/store";
@@ -18,11 +20,11 @@ import PrivateRoute from "./components/PrivateRoute";
 
 const router = createBrowserRouter([
     {
-        path: "/",
+        path: "/admin",
         element: <Layout />,
         children: [
             {
-                path: "/users",
+                path: "users",
                 element: (
                     <PrivateRoute>
                         <UserPage />
@@ -30,7 +32,7 @@ const router = createBrowserRouter([
                 ),
             },
             {
-                path: "/categories",
+                path: "categories",
                 element: (
                     <PrivateRoute>
                         <CategoryPage />
@@ -38,7 +40,7 @@ const router = createBrowserRouter([
                 ),
             },
             {
-                path: "/products",
+                path: "products",
                 element: (
                     <PrivateRoute>
                         <ProductPage />
@@ -50,6 +52,16 @@ const router = createBrowserRouter([
     {
         path: "/login",
         element: <LoginPage />,
+    },
+    {
+        path: "/",
+        element: <Shop />,
+        children: [
+            {
+                path: "/",
+                element: <Home />,
+            },
+        ],
     },
 ]);
 
